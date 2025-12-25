@@ -5,6 +5,7 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 import tools.jackson.databind.ObjectMapper;
 
 public class Client {
@@ -19,41 +20,99 @@ public class Client {
     this.httpClient = builder.getHttpClient();
   }
 
-  public <T> T get(T cls) {
-    return null;
+  public <T> T get(String path, Class<T> cls) throws RestClientException {
+    Request request = new Request.Builder().url(buildUrl(path)).get().build();
+
+    return executeRequest(request, cls);
   }
 
   public <T> T post(Object payload, String path, Class<T> cls)
     throws RestClientException {
-    var urlPath = baseUrl.concat(path);
-    var body = mapper.writeValueAsString(payload);
-    var req = new Request.Builder()
-      .url(urlPath)
-      .patch(RequestBody.create(body, JSON))
+    RequestBody body = createJsonBody(payload);
+    Request request = new Request.Builder()
+      .url(buildUrl(path))
+      .post(body)
       .build();
 
-    try (var res = httpClient.newCall(req).execute()) {
-      var resBody = res.body().string();
-      var resClass = mapper.readValue(resBody, cls);
-      return resClass;
+    return executeRequest(request, cls);
+  }
+
+  public <T> T put(Object payload, String path, Class<T> cls)
+    throws RestClientException {
+    RequestBody body = createJsonBody(payload);
+    Request request = new Request.Builder()
+      .url(buildUrl(path))
+      .put(body)
+      .build();
+
+    return executeRequest(request, cls);
+  }
+
+  public <T> T patch(Object payload, String path, Class<T> cls)
+    throws RestClientException {
+    RequestBody body = createJsonBody(payload);
+    Request request = new Request.Builder()
+      .url(buildUrl(path))
+      .patch(body)
+      .build();
+
+    return executeRequest(request, cls);
+  }
+
+  public <T> T delete(String path, Class<T> cls) throws RestClientException {
+    Request request = new Request.Builder()
+      .url(buildUrl(path))
+      .delete()
+      .build();
+
+    return executeRequest(request, cls);
+  }
+
+  private <T> T executeRequest(Request request, Class<T> cls)
+    throws RestClientException {
+    try (Response response = httpClient.newCall(request).execute()) {
+      String responseBody = response.body().string();
+
+      if (!response.isSuccessful()) {
+        throw new RestClientException(
+          request.url().toString(),
+          String.format(
+            "%s request failed with status code: %d, body: %s",
+            request.method(),
+            response.code(),
+            responseBody
+          ),
+          null
+        );
+      }
+
+      return mapper.readValue(responseBody, cls);
+    } catch (RestClientException e) {
+      throw e;
     } catch (Exception e) {
       throw new RestClientException(
-        urlPath,
-        "Post request error",
-        e.getCause()
+        request.url().toString(),
+        String.format("%s request error: %s", request.method(), e.getMessage()),
+        e
       );
     }
   }
 
-  public <T> T patch(T cls) {
-    return null;
+  private String buildUrl(String path) {
+    return baseUrl.concat(path);
   }
 
-  public <T> T delete(T cls) {
-    return null;
-  }
-
-  public <T> T put(T cls) {
-    return null;
+  private RequestBody createJsonBody(Object payload)
+    throws RestClientException {
+    try {
+      String json = mapper.writeValueAsString(payload);
+      return RequestBody.create(json, JSON);
+    } catch (Exception e) {
+      throw new RestClientException(
+        baseUrl,
+        "Failed to serialize payload to JSON: " + e.getMessage(),
+        e
+      );
+    }
   }
 }
