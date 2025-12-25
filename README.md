@@ -24,14 +24,22 @@ var client = new Client(builder);
 ### POST Request
 
 ```java
+@JsonAutoDetect(fieldVisibility = Visibility.ANY)
+class User {
+  String id;
+  String name;
+  int age;
+}
+
 // Buat object yang akan dikirim
-var data = new MyData();
-data.name = "Testing";
-data.value = "123";
+var data = new User();
+data.name = "Ucup";
+data.age = 20;
 
 // Kirim POST request
 try {
-    var response = client.post(data, "/api/endpoint", MyResponse.class);
+    var response = client.post(data, "/api/users", User.class);
+    // tipe data response = User
     System.out.println(response);
 } catch (RestClientException e) {
     System.err.println("Error: " + e.getMessage());
@@ -58,5 +66,5 @@ var client = new Client(builder);
 ## Requirement
 
 - Java 17+
-- OkHttp 5.x
+- OkHttp3 5.x
 - Jackson 3.x
