@@ -40,13 +40,15 @@ jobs:
         run: |
           ARTIFACT_PATH=$(find target -name "*-${{ steps.version.outputs.VERSION }}.jar" ! -name "*-original.jar" | head -n 1)
           ARTIFACT_NAME=$(basename "$ARTIFACT_PATH")
-          echo "PATH=$ARTIFACT_PATH" >> $GITHUB_OUTPUT
-          echo "NAME=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
+          FINAL_NAME="simple-rest-client-${{ steps.version.outputs.VERSION }}.jar"
+          mv "$ARTIFACT_PATH" "target/$FINAL_NAME"
+          echo "PATH=target/$FINAL_NAME" >> $GITHUB_OUTPUT
+          echo "NAME=$FINAL_NAME" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          name: Release ${{ steps.version.outputs.VERSION }}
+          name: simple-rest-client ${{ steps.version.outputs.VERSION }}
           draft: false
           prerelease: false
           files: ${{ steps.artifact.outputs.PATH }}
