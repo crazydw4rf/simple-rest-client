@@ -97,13 +97,6 @@
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
           <version>3.4.2</version>
-          <configuration>
-            <archive>
-              <manifest>
-                <mainClass>com.simplerest.Main</mainClass>
-              </manifest>
-            </archive>
-          </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
@@ -126,14 +119,6 @@
     </pluginManagement>
     <plugins>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>3.1.0</version>
-        <configuration>
-          <mainClass>com.simplerest.Main</mainClass>
-        </configuration>
-      </plugin>
-      <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-shade-plugin</artifactId>
           <version>3.5.3</version>
@@ -146,13 +131,6 @@
                   <configuration>
                       <shadedArtifactAttached>true</shadedArtifactAttached>
                       <shadedClassifierName>fat</shadedClassifierName>
-                      <transformers>
-                          <transformer
-                  implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"
-                >
-                              <mainClass>com.simplerest.Main</mainClass>
-                          </transformer>
-                      </transformers>
                   </configuration>
               </execution>
           </executions>
