@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - "*"
+  workflow_dispatch:
 
 jobs:
   release:
@@ -38,12 +39,10 @@ jobs:
       - name: Get artifact name
         id: artifact
         run: |
-          ARTIFACT_PATH=$(find target -name "*-${{ steps.version.outputs.VERSION }}.jar" ! -name "*-original.jar" | head -n 1)
+          ARTIFACT_PATH=$(find target -name "simple-rest-client-${{ steps.version.outputs.VERSION }}.jar" | head -n 1)
           ARTIFACT_NAME=$(basename "$ARTIFACT_PATH")
-          FINAL_NAME="simple-rest-client-${{ steps.version.outputs.VERSION }}.jar"
-          mv "$ARTIFACT_PATH" "target/$FINAL_NAME"
-          echo "PATH=target/$FINAL_NAME" >> $GITHUB_OUTPUT
-          echo "NAME=$FINAL_NAME" >> $GITHUB_OUTPUT
+          echo "PATH=$ARTIFACT_PATH" >> $GITHUB_OUTPUT
+          echo "NAME=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
