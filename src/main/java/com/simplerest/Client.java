@@ -1,6 +1,5 @@
-package com.simplerest.HTTPClient;
+package com.simplerest;
 
-import com.simplerest.RestClientException;
 import okhttp3.*;
 import tools.jackson.databind.ObjectMapper;
 

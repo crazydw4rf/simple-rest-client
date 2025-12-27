@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.simplerest.HTTPClient.*;
+import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -18,7 +18,11 @@ public class RequestTest {
   @BeforeAll
   public static void setupClient() throws Exception {
     var builder = ClientBuilder.builder();
-    builder.baseUrl(BASE_URL).build();
+    var okhttpbuilder = new OkHttpClient.Builder();
+    okhttpbuilder.cookieJar(new CookieSession());
+    okhttpbuilder.addInterceptor(new LoggingInterceptor());
+
+    builder.baseUrl(BASE_URL).httpClient(okhttpbuilder.build()).build();
     client = new Client(builder);
   }
 

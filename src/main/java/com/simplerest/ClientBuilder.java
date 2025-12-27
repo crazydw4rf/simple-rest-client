@@ -1,6 +1,6 @@
-package com.simplerest.HTTPClient;
+package com.simplerest;
 
-import okhttp3.OkHttpClient;
+import okhttp3.*;
 
 public class ClientBuilder {
 
@@ -31,7 +31,8 @@ public class ClientBuilder {
 
   public Client build() throws Exception {
     if (httpClient == null) {
-      httpClient = new OkHttpClient();
+      var builder = new OkHttpClient.Builder();
+      httpClient = builder.build();
     } else if (baseUrl.isBlank()) {
       throw new Exception("baseUrl gak boleh kosong");
     }
