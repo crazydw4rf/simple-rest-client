@@ -10,9 +10,9 @@ public class Client {
   private final OkHttpClient httpClient;
   private final String baseUrl;
 
-  public Client(ClientBuilder builder) {
-    this.baseUrl = builder.getBaseUrl();
-    this.httpClient = builder.getHttpClient();
+  public Client(ClientOption option) {
+    this.baseUrl = option.getBaseUrl();
+    this.httpClient = option.getHttpClient();
   }
 
   public <T> T get(String path, Class<T> cls) throws RestClientException {

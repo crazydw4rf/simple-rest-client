@@ -17,13 +17,13 @@ public class RequestTest {
 
   @BeforeAll
   public static void setupClient() throws Exception {
-    var builder = ClientBuilder.builder();
+    var clientOption = ClientOption.builder();
     var okhttpbuilder = new OkHttpClient.Builder();
     okhttpbuilder.cookieJar(new CookieSession());
     okhttpbuilder.addInterceptor(new LoggingInterceptor());
 
-    builder.baseUrl(BASE_URL).httpClient(okhttpbuilder.build()).build();
-    client = new Client(builder);
+    clientOption.baseUrl(BASE_URL).httpClient(okhttpbuilder.build());
+    client = new Client(clientOption.build());
   }
 
   @Test
