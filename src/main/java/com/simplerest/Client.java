@@ -2,17 +2,24 @@ package com.simplerest;
 
 import okhttp3.*;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.datatype.jsr310.JavaTimeModule;
 
 public class Client {
 
   private final MediaType JSON = MediaType.get("application/json");
-  private final ObjectMapper mapper = new ObjectMapper();
+  private final ObjectMapper mapper;
   private final OkHttpClient httpClient;
   private final String baseUrl;
 
   public Client(ClientOption option) {
     this.baseUrl = option.getBaseUrl();
     this.httpClient = option.getHttpClient();
+
+    this.mapper = JsonMapper.builder()
+        .addModule(new JavaTimeModule())
+        .configure(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS, false).build();
   }
 
   public <T> T get(String path, Class<T> cls) throws RestClientException {
