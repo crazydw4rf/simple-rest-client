@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Configuration status="WARN">
+    <Properties>
+        <!-- Default log levels - can be overridden via environment variables -->
+        <Property name="APP_LOG_LEVEL">INFO</Property>
+        <Property name="APP_ROOT_LOG_LEVEL">WARN</Property>
+        <!-- simple-rest-client log level - defaults to DEBUG, override with LOG_LEVEL env var -->
+        <Property
+      name="SIMPLE_REST_LOG_LEVEL"
+    >${env:LOG_LEVEL:-DEBUG}</Property>
+        <!-- Same pattern as Logback: classname:line level - message -->
+        <Property name="PATTERN">%logger{36}:%L %-5level - %msg%n</Property>
+        <Property
+      name="PATTERN_LONG"
+    >%logger{50}:%L %-5level - %msg%n</Property>
+        <Property
+      name="ERROR_PATTERN"
+    >%logger{50}:%L %-5level - %msg%n%throwable{full}%n</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- Console appender - compact format (same as Logback) -->
+        <Console name="CONSOLE" target="SYSTEM_OUT">
+            <PatternLayout pattern="${PATTERN}" />
+        </Console>
+
+        <!-- File appender - compact format (same as Logback) -->
+        <File name="FILE" fileName="logs/simple-rest-client.log" append="true">
+            <PatternLayout pattern="${PATTERN_LONG}" />
+        </File>
+
+        <!-- Error file appender - includes stack traces (same as Logback) -->
+        <File name="ERROR_FILE" fileName="logs/errors.log" append="true">
+            <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY" />
+            <PatternLayout pattern="${ERROR_PATTERN}" />
+        </File>
+    </Appenders>
+
+    <Loggers>
+        <!-- simple-rest-client library logger - controlled by LOG_LEVEL env var -->
+        <Logger
+      name="com.simplerest"
+      level="${SIMPLE_REST_LOG_LEVEL}"
+      additivity="false"
+    >
+          <AppenderRef ref="CONSOLE" />
+          <AppenderRef ref="FILE" />
+          <AppenderRef ref="ERROR_FILE" />
+        </Logger>
+
+        <!-- Reduce noise from third-party libraries -->
+        <Logger name="okhttp3" level="WARN" />
+        <Logger name="com.fasterxml.jackson" level="WARN" />
+        <Logger name="tools.jackson" level="WARN" />
+
+        <!-- Root logger configuration -->
+        <Root level="${APP_ROOT_LOG_LEVEL}">
+            <AppenderRef ref="CONSOLE" />
+            <AppenderRef ref="FILE" />
+            <AppenderRef ref="ERROR_FILE" />
+        </Root>
+    </Loggers>
+</Configuration>

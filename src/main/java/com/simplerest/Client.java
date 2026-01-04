@@ -1,28 +1,27 @@
 package com.simplerest;
 
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.datatype.jsr310.JavaTimeModule;
 
+@Slf4j
 public class Client {
 
   private final MediaType JSON = MediaType.get("application/json");
-  private final ObjectMapper mapper;
+  private final ObjectMapper mapper = new ObjectMapper();
   private final OkHttpClient httpClient;
   private final String baseUrl;
 
   public Client(ClientOption option) {
     this.baseUrl = option.getBaseUrl();
     this.httpClient = option.getHttpClient();
-
-    this.mapper = JsonMapper.builder()
-        .addModule(new JavaTimeModule())
-        .configure(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS, false).build();
   }
 
   public <T> T get(String path, Class<T> cls) throws RestClientException {
+    var url = buildUrl(path);
+    log.debug("New GET request created with:\nurl: {}", url);
+
     Request request = new Request.Builder().url(buildUrl(path)).get().build();
 
     return executeRequest(request, cls);
@@ -30,42 +29,54 @@ public class Client {
 
   public <T> T post(Object payload, String path, Class<T> cls)
     throws RestClientException {
+    var url = buildUrl(path);
+    log.debug(
+      "New POST request created with:\nurl: {}\nbody: {}\n",
+      url,
+      payload
+    );
+
     RequestBody body = createJsonBody(payload);
-    Request request = new Request.Builder()
-      .url(buildUrl(path))
-      .post(body)
-      .build();
+    Request request = new Request.Builder().url(url).post(body).build();
 
     return executeRequest(request, cls);
   }
 
   public <T> T put(Object payload, String path, Class<T> cls)
     throws RestClientException {
+    var url = buildUrl(path);
+    log.debug(
+      "New PUT request created with:\nurl: {}\nbody: {}\n",
+      url,
+      payload
+    );
+
     RequestBody body = createJsonBody(payload);
-    Request request = new Request.Builder()
-      .url(buildUrl(path))
-      .put(body)
-      .build();
+    Request request = new Request.Builder().url(url).put(body).build();
 
     return executeRequest(request, cls);
   }
 
   public <T> T patch(Object payload, String path, Class<T> cls)
     throws RestClientException {
+    var url = buildUrl(path);
+    log.debug(
+      "New PATCH request created with:\nurl: {}\nbody: {}\n",
+      url,
+      payload
+    );
+
     RequestBody body = createJsonBody(payload);
-    Request request = new Request.Builder()
-      .url(buildUrl(path))
-      .patch(body)
-      .build();
+    Request request = new Request.Builder().url(url).patch(body).build();
 
     return executeRequest(request, cls);
   }
 
   public <T> T delete(String path, Class<T> cls) throws RestClientException {
-    Request request = new Request.Builder()
-      .url(buildUrl(path))
-      .delete()
-      .build();
+    var url = buildUrl(path);
+    log.debug("New DELETE request created with:\nurl: {}\n", url);
+
+    Request request = new Request.Builder().url(url).delete().build();
 
     return executeRequest(request, cls);
   }

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.ToString;
 import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.*;
 
@@ -139,6 +140,7 @@ public class RequestTest {
 }
 
 @JsonAutoDetect(fieldVisibility = Visibility.ANY)
+@ToString
 class Product {
 
   String id;
@@ -149,6 +151,7 @@ class Product {
 }
 
 @JsonAutoDetect(fieldVisibility = Visibility.ANY)
+@ToString
 class ProductData {
 
   @JsonProperty("CPU model")
@@ -165,6 +168,7 @@ class ProductData {
 }
 
 @JsonAutoDetect(fieldVisibility = Visibility.ANY)
+@ToString
 class DeleteResponse {
 
   String message;
