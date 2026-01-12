@@ -2,11 +2,19 @@ package com.simplerest;
 
 public class RestClientException extends Exception {
 
-  public RestClientException(String url, String message, Throwable e) {
-    super(String.format("[HTTP Client Error]: %s | %s\n", url, message), e);
-  }
+  private final ErrorResponse error;
 
   public RestClientException(String message) {
     super(message);
+    this.error = null;
+  }
+
+  public RestClientException(ErrorResponse error) {
+    super(error.getMessage());
+    this.error = error;
+  }
+
+  public ErrorResponse getError() {
+    return error;
   }
 }
