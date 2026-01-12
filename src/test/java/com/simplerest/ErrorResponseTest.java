@@ -1,16 +1,13 @@
 package com.simplerest;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import lombok.ToString;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.WireMockServer;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Slf4j
@@ -18,9 +15,10 @@ public class ErrorResponseTest {
 
   private static final String BASE_URL = "http://localhost:8080";
   private static Client client;
+  private static ObjectMapper mapper = new ObjectMapper();
+  private WireMockServer wms;
 
-  @BeforeAll
-  public static void setupClient() throws Exception {
+  static {
     var okhttpbuilder = new OkHttpClient.Builder();
     okhttpbuilder.cookieJar(new CookieSession());
     okhttpbuilder.addInterceptor(new LoggingInterceptor());
@@ -32,17 +30,45 @@ public class ErrorResponseTest {
     client = new Client(clientOption);
   }
 
-  @ToString
-  public class Foo {
+  @BeforeEach
+  public void beforeEach() throws Exception {
+    wms = new WireMockServer(8080);
+    wms.start();
+    configureFor("localhost", wms.port());
+  }
 
-    String message;
+  @AfterEach
+  public void afterEach() throws Exception {
+    wms.stop();
   }
 
   @Test
   @Order(1)
   public void testErrorResponse() {
+    var err = new ErrorResponse();
+    err.setMessage("Error message");
+    err.setCode(404);
+    err.setIsExpected(false);
+
+    String payload = null;
     try {
-      var response = client.get("/error", Foo.class);
+      payload = mapper.writeValueAsString(err);
+    } catch (Exception ignore) {}
+
+    assertNotNull(payload);
+
+    log.info("Payload: {}", payload);
+
+    wms.stubFor(
+      get("/not-found").willReturn(
+        notFound()
+          .withHeader("Content-Type", "application/json")
+          .withBody(payload)
+      )
+    );
+
+    try {
+      var response = client.get("/not-found", String.class);
       log.debug("Response: {}", response);
 
       assertNotNull(response);
@@ -52,7 +78,7 @@ public class ErrorResponseTest {
       assertNotNull(error);
 
       assertNotNull(error.getMessage());
-      assertTrue(error.getCode() >= 400);
+      assertEquals(error.getCode(), 404);
     }
   }
 }

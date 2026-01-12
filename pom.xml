@@ -8,7 +8,7 @@
 
   <groupId>com.simplerest</groupId>
   <artifactId>simple-rest-client</artifactId>
-  <version>1.6.0-stable</version>
+  <version>1.6.1-stable</version>
 
   <name>simple-rest-client</name>
 
@@ -36,6 +36,18 @@
         <artifactId>lombok</artifactId>
         <version>1.18.42</version>
         <scope>provided</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.wiremock</groupId>
+        <artifactId>wiremock</artifactId>
+        <version>3.13.2</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>3.26.3</version>
+        <scope>test</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/tools.jackson.datatype/jackson-datatype-jsr310 -->
     <dependency>
