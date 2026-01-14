@@ -65,20 +65,22 @@ public class Client {
 
       if (!response.isSuccessful()) {
         try {
-          var error = mapper.readValue(responseBody, ErrorResponse.class);
+          var root = mapper.readTree(responseBody);
+          var error = mapper.treeToValue(
+            root.at("/error"),
+            ErrorResponse.class
+          );
           throw new RestClientException(error);
         } catch (JacksonException e) {
-          throw new RestClientException("Can't parse error response");
+          throw new RestClientException(
+            "Can't parse error response: " + e.getMessage()
+          );
         }
       }
 
       return mapper.readValue(responseBody, cls);
-    } catch (IOException e) {
-      var err = new ErrorResponse();
-      err.setMessage(e.getMessage());
-      err.setCode(0);
-      err.setIsExpected(false);
-      throw new RestClientException(err);
+    } catch (IOException | JacksonException e) {
+      throw new RestClientException(e.getMessage());
     }
   }
 

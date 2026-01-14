@@ -6,7 +6,7 @@ public class RestClientException extends Exception {
 
   public RestClientException(String message) {
     super(message);
-    this.error = null;
+    this.error = new ErrorResponse(0, message, false);
   }
 
   public RestClientException(ErrorResponse error) {

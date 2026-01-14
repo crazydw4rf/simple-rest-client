@@ -45,14 +45,13 @@ public class ErrorResponseTest {
   @Test
   @Order(1)
   public void testErrorResponse() {
-    var err = new ErrorResponse();
-    err.setMessage("Error message");
-    err.setCode(404);
-    err.setIsExpected(false);
+    var err = new ErrorResponse(404, "Error message", false);
+    var payloadObj = mapper.createObjectNode();
+    payloadObj.putPOJO("error", err);
 
     String payload = null;
     try {
-      payload = mapper.writeValueAsString(err);
+      payload = mapper.writeValueAsString(payloadObj);
     } catch (Exception ignore) {}
 
     assertNotNull(payload);
@@ -78,7 +77,7 @@ public class ErrorResponseTest {
       assertNotNull(error);
 
       assertNotNull(error.getMessage());
-      assertEquals(error.getCode(), 404);
+      assertEquals(404, error.getCode());
     }
   }
 }
